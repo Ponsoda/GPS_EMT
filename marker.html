@@ -11,35 +11,38 @@
         crossorigin=""></script>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-<title>Page Title</title>
+        <script src="https://unpkg.com/esri-leaflet@2.3.2/dist/esri-leaflet.js"
+  integrity="sha512-6LVib9wGnqVKIClCduEwsCub7iauLXpwrd5njR2J507m3A2a4HXJDLMiSZzjcksag3UluIfuW1KzuWVI5n/cuQ=="
+  crossorigin=""></script>
+
+<title>Real-Time EMT</title>
 </head>
 <body>
 <div id="mapid"></div>
-
-
+<button id="buttonId" onclick='myFunction()'>Run</button>
+<input type="text" id="busId" size="35">
 </body>
 <script>
 var map = L.map('mapid').setView([40.43985191183682, -3.6736841892211034], 13);
+var layer = L.esri.basemapLayer('DarkGray').addTo(map);
+map.addLayer(layer);
+var group;
+var busId;
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
 
-
-
-/*var baseballIcon = L.icon({
+var myIcon = L.icon({
         iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Aiga_bus_on_blue_circle.svg',
         iconSize: [32, 37],
         iconAnchor: [16, 37],
         popupAnchor: [0, -28]
-    });*/
-
+    });
+    
 
  function callApiRest() {
             axios({
                     method: 'post',
                     url: "https://openapi.emtmadrid.es/v1/mobilitylabs/collection/reactive/ff594c7a-8a7c-423a-8a06-c14a4fac5bff/2/",
-                    data: '{"_id": "8325"}', 
+                    data: '{"linea": '+busId+'}', 
                     headers: {
                         "accessToken":  "accessToken",//Add here your access token
                         "Content-Type": "application/json"
@@ -47,21 +50,47 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     }
                     
                 }).then(function(response) {
-                    console.log(response.data.data[0].dateExpired);
-                    L.marker([response.data.data[0].geometry.coordinates[1],response.data.data[0].geometry.coordinates[0]]).addTo(map)
-                      .bindPopup("Meters: "+response.data.data[0].meters)
-                      .openPopup();
+                   
+                    if(group!=undefined){map.removeLayer(group); }
+                     group = L.layerGroup().addTo(map);
+
+                    
+                       
+                    for(var i=0; i<response.data.data.length;i++){
+                    L.marker(
+                        [response.data.data[i].geometry.coordinates[1],response.data.data[0].geometry.coordinates[0]], {icon: myIcon}
+                        ).bindPopup("Bus Number: "+response.data.data[i].bus)
+                        .addTo(group)
+                        
+                        
+                       // 
+                        //.openPopup()
+                        
+                    
+                     }
+                     //L.layerGroup(markers).addTo(map)
+                     //map.addLayer(markers)
+                             
+                     
                 })
                 .catch(function(error) {
                     alert(error);
                 });
+            
 
         }
 
-var requestLoop = setInterval(function(){ 
-callApiRest()
-}, 10000);
 
+function myFunction() {
+  busId=document.getElementById("busId").value;
+
+
+
+var requestLoop = setInterval(function(){ 
+callApiRest(busId)
+}, 5000);
+
+}
 
 </script>
 </html>
