@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style> #mapid { height: 700px;}</style>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
+        <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+        integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+        crossorigin=""></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<title>Page Title</title>
+</head>
+<body>
+<div id="mapid"></div>
+
+
+</body>
+<script>
+var map = L.map('mapid').setView([40.43985191183682, -3.6736841892211034], 13);
+var polyline = new L.Polyline([]).addTo(map);
+
+polyline.setStyle({
+    color: 'black'
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+
+
+/*var baseballIcon = L.icon({
+        iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Aiga_bus_on_blue_circle.svg',
+        iconSize: [32, 37],
+        iconAnchor: [16, 37],
+        popupAnchor: [0, -28]
+    });*/
+
+
+ function callApiRest() {
+            axios({
+                    method: 'post',
+                    url: "https://openapi.emtmadrid.es/v1/mobilitylabs/collection/reactive/ff594c7a-8a7c-423a-8a06-c14a4fac5bff/2/",
+                    data: '{"_id": "8325"}', 
+                    headers: {
+                        "accessToken":  "accessToken",//Add here your access token
+                        "Content-Type": "application/json"
+
+                    }
+                    
+                }).then(function(response) {
+                    console.log(response.data.data[0].dateExpired);
+                    polyline.addLatLng([response.data.data[0].geometry.coordinates[1],response.data.data[0].geometry.coordinates[0]])
+                    L.marker([response.data.data[0].geometry.coordinates[1],response.data.data[0].geometry.coordinates[0]]).addTo(map)
+                })
+                .catch(function(error) {
+                    alert(error);
+                });
+
+        }
+
+var requestLoop = setInterval(function(){ 
+callApiRest()
+}, 16000);
+
+
+</script>
+</html>
