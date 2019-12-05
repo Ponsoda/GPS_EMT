@@ -58,7 +58,7 @@ var myIcon = L.icon({
                        
                     for(var i=0; i<response.data.data.length;i++){
                     L.marker(
-                        [response.data.data[i].geometry.coordinates[1],response.data.data[0].geometry.coordinates[0]], {icon: myIcon}
+                        [response.data.data[i].geometry.coordinates[1],response.data.data[i].geometry.coordinates[0]], {icon: myIcon}
                         ).bindPopup("Bus Number: "+response.data.data[i].bus)
                         .addTo(group)
                         
