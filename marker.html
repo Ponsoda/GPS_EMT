@@ -17,10 +17,14 @@
 
 <title>Real-Time EMT</title>
 </head>
-<body>
-<div id="mapid"></div>
-<button id="buttonId" onclick='myFunction()'>Run</button>
-<input type="text" id="busId" size="35">
+<body style="background-color:#c0c0c0">
+<center ><IMG SRC="https://upload.wikimedia.org/wikipedia/commons/6/66/EMT_Madrid_Logo.png" ALT="some text" WIDTH=150 HEIGHT=110><h1 style="font-family:Helvetica" >    Bus tracking in real time</h1></center>
+
+<div><button id="buttonId" onclick='myFunction()'>Add one line number</button>
+<input type="text" id="busId" size="5"> </div>
+<br>
+<div href="#middle" id="mapid"></div>
+
 </body>
 <script>
 var map = L.map('mapid').setView([40.43985191183682, -3.6736841892211034], 13);
@@ -28,8 +32,6 @@ var layer = L.esri.basemapLayer('DarkGray').addTo(map);
 map.addLayer(layer);
 var group;
 var busId;
-
-
 var myIcon = L.icon({
         iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Aiga_bus_on_blue_circle.svg',
         iconSize: [32, 37],
@@ -37,7 +39,6 @@ var myIcon = L.icon({
         popupAnchor: [0, -28]
     });
     
-
  function callApiRest() {
             axios({
                     method: 'post',
@@ -46,14 +47,12 @@ var myIcon = L.icon({
                     headers: {
                         "accessToken":  "accessToken",//Add here your access token
                         "Content-Type": "application/json"
-
                     }
                     
                 }).then(function(response) {
                    
                     if(group!=undefined){map.removeLayer(group); }
                      group = L.layerGroup().addTo(map);
-
                     
                        
                     for(var i=0; i<response.data.data.length;i++){
@@ -77,20 +76,12 @@ var myIcon = L.icon({
                     alert(error);
                 });
             
-
         }
-
-
 function myFunction() {
   busId=document.getElementById("busId").value;
-
-
-
 var requestLoop = setInterval(function(){ 
 callApiRest(busId)
 }, 5000);
-
 }
-
 </script>
 </html>
